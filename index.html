@@ -1016,6 +1016,7 @@
       query: "",
       todoView: "due",
       lastProjectId: "inbox",
+      autoSync: true,
       filters: { scope: "all", priority: "all", projectId: "all", due: "all", tag: "all" },
       calendarDate: localMonthISO(new Date()),
       projects: [
@@ -1061,12 +1062,21 @@
       next.todos = (saved.todos || []).map(item => ({ projectId: "inbox", tags: [], dueDate: "", progress: 0, ...item }));
       next.memos = (saved.memos || []).map(item => ({ projectId: "inbox", tags: [], ...item }));
       next.schedules = (saved.schedules || []).map(item => ({ scope: "work", projectId: "inbox", tags: [], endTime: "", ...item }));
+      if (typeof next.autoSync !== "boolean") next.autoSync = true;
       if (!next.calendarDate) next.calendarDate = localMonthISO(new Date());
       return next;
     }
 
     function saveState() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      scheduleAutoUpload();
+    }
+
+    let autoUploadTimer = null;
+    function scheduleAutoUpload() {
+      if (!state.autoSync || !cloudUser) return;
+      clearTimeout(autoUploadTimer);
+      autoUploadTimer = setTimeout(() => uploadCloudState(true), 3000);
     }
 
     function uid() {
@@ -2034,31 +2044,52 @@
       updateCloudUi();
     }
 
-    async function uploadCloudState() {
+    async function uploadCloudState(silent = false) {
       const user = await requireCloudSession();
       if (!user) return;
-      setCloudStatus("正在上传本地数据到云端...");
+      if (!silent) setCloudStatus("正在上传本地数据到云端...");
       const payload = {
         user_id: user.id,
         data: state,
         updated_at: new Date().toISOString()
       };
       const { error } = await cloudClient.from(CLOUD_TABLE).upsert(payload, { onConflict: "user_id" });
-      if (error) return setCloudStatus(`上传失败：${error.message}`);
-      setCloudStatus("上传完成。其他设备可登录后点击“从云端拉取”。");
+      if (error) {
+        if (!silent) setCloudStatus(`上传失败：${error.message}`);
+        return;
+      }
+      if (!silent) setCloudStatus("上传完成。其他设备可登录后点击“从云端拉取”。");
     }
 
-    async function downloadCloudState() {
+    async function downloadCloudState(auto = false) {
       const user = await requireCloudSession();
       if (!user) return;
-      if (!confirm("从云端拉取会覆盖当前浏览器本地数据，确认继续？")) return;
-      setCloudStatus("正在从云端拉取数据...");
+      if (!auto && !confirm("从云端拉取会覆盖当前浏览器本地数据，确认继续？")) return;
+      if (!auto) setCloudStatus("正在从云端拉取数据...");
       const { data, error } = await cloudClient.from(CLOUD_TABLE).select("data, updated_at").eq("user_id", user.id).maybeSingle();
-      if (error) return setCloudStatus(`拉取失败：${error.message}`);
-      if (!data?.data) return setCloudStatus("云端暂无数据。可先在一台设备上上传本地数据。");
+      if (error) {
+        if (!auto) setCloudStatus(`拉取失败：${error.message}`);
+        return;
+      }
+      if (!data?.data) {
+        if (!auto) setCloudStatus("云端暂无数据。可先在一台设备上上传本地数据。");
+        return;
+      }
       state = normalizeState(data.data);
       render();
-      setCloudStatus(`拉取完成。云端更新时间：${data.updated_at || "未知"}`);
+      if (!auto) setCloudStatus(`拉取完成。云端更新时间：${data.updated_at || "未知"}`);
+    }
+
+    async function tryAutoDownload() {
+      if (!state.autoSync || !cloudUser) return;
+      try {
+        const { data, error } = await cloudClient.from(CLOUD_TABLE).select("data, updated_at").eq("user_id", cloudUser.id).maybeSingle();
+        if (error || !data?.data) return;
+        state = normalizeState(data.data);
+        render();
+      } catch {
+        // 静默失败
+      }
     }
 
     function onClickIfExists(selector, handler) {
@@ -2126,7 +2157,7 @@
     });
 
     render();
-    refreshCloudSession();
+    refreshCloudSession().then(() => tryAutoDownload());
 
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.register("./sw.js")
