@@ -975,8 +975,12 @@
                 <button class="btn" id="cloudUpload" type="button" disabled>上传本地到云端</button>
                 <button class="btn" id="cloudDownload" type="button" disabled>从云端拉取</button>
                 <button class="btn ghost" id="cloudSignOut" type="button" disabled>退出登录</button>
+                <label style="display:flex;align-items:center;gap:6px;font-size:var(--font-xs);color:var(--muted);cursor:pointer;">
+                  <input type="checkbox" id="autoSyncToggle" checked /> 自动同步
+                </label>
               </div>
               <div class="cloud-status" id="cloudStatus">Supabase 尚未配置，当前仍使用本地数据。</div>
+              <div class="cloud-status" id="syncStatus" style="margin-top:4px;"></div>
             </div>
             <div class="data-actions">
               <button class="btn" id="seedBtnInline">填充示例数据</button>
@@ -1017,6 +1021,7 @@
       todoView: "due",
       lastProjectId: "inbox",
       autoSync: true,
+      lastSyncTime: null,
       filters: { scope: "all", priority: "all", projectId: "all", due: "all", tag: "all" },
       calendarDate: localMonthISO(new Date()),
       projects: [
@@ -1063,6 +1068,7 @@
       next.memos = (saved.memos || []).map(item => ({ projectId: "inbox", tags: [], ...item }));
       next.schedules = (saved.schedules || []).map(item => ({ scope: "work", projectId: "inbox", tags: [], endTime: "", ...item }));
       if (typeof next.autoSync !== "boolean") next.autoSync = true;
+      if (!next.lastSyncTime) next.lastSyncTime = null;
       if (!next.calendarDate) next.calendarDate = localMonthISO(new Date());
       return next;
     }
@@ -1977,6 +1983,17 @@
       $("#cloudSignOut").disabled = !cloudReady || !signedIn;
       $("#cloudSignIn").disabled = !cloudReady || signedIn;
       $("#cloudSignUp").disabled = !cloudReady || signedIn;
+      const autoSyncNode = $("#autoSyncToggle");
+      if (autoSyncNode) autoSyncNode.checked = state.autoSync;
+      const syncStatusNode = $("#syncStatus");
+      let syncMsg = "";
+      if (state.autoSync) {
+        syncMsg = "自动同步已开启";
+        if (state.lastSyncTime) syncMsg += ` · 上次同步 ${new Date(state.lastSyncTime).toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit" })}`;
+      } else {
+        syncMsg = "自动同步已关闭";
+      }
+      if (syncStatusNode) syncStatusNode.textContent = syncMsg;
       if (!cloudReady) {
         setCloudStatus("Supabase 尚未配置。请在代码顶部填写 SUPABASE_URL 和 SUPABASE_ANON_KEY，当前仍使用本地数据。");
       } else if (signedIn) {
@@ -2022,6 +2039,7 @@
       if (error) return setCloudStatus(`登录失败：${error.message}`);
       cloudUser = data.session?.user || null;
       updateCloudUi();
+      tryAutoDownload();
     }
 
     async function signUpCloud() {
@@ -2035,6 +2053,7 @@
       cloudUser = data.session?.user || null;
       setCloudStatus(cloudUser ? "注册并登录成功，可以开始同步。" : "注册成功。请先到邮箱确认账号，然后回到这里重新登录。");
       updateCloudUi();
+      if (cloudUser) tryAutoDownload();
     }
 
     async function signOutCloud() {
@@ -2058,7 +2077,9 @@
         if (!silent) setCloudStatus(`上传失败：${error.message}`);
         return;
       }
-      if (!silent) setCloudStatus("上传完成。其他设备可登录后点击“从云端拉取”。");
+      state.lastSyncTime = Date.now();
+      if (!silent) setCloudStatus("上传完成。其他设备可登录后点击「从云端拉取」");
+      updateCloudUi();
     }
 
     async function downloadCloudState(auto = false) {
@@ -2086,7 +2107,9 @@
         const { data, error } = await cloudClient.from(CLOUD_TABLE).select("data, updated_at").eq("user_id", cloudUser.id).maybeSingle();
         if (error || !data?.data) return;
         state = normalizeState(data.data);
+        state.lastSyncTime = Date.now();
         render();
+        updateCloudUi();
       } catch {
         // 静默失败
       }
@@ -2105,6 +2128,15 @@
     onClickIfExists("#cloudSignOut", signOutCloud);
     onClickIfExists("#cloudUpload", uploadCloudState);
     onClickIfExists("#cloudDownload", downloadCloudState);
+
+    const autoSyncToggle = $("#autoSyncToggle");
+    if (autoSyncToggle) {
+      autoSyncToggle.addEventListener("change", event => {
+        state.autoSync = event.target.checked;
+        saveState();
+        updateCloudUi();
+      });
+    }
 
     $("#importFile").addEventListener("change", event => {
       const file = event.target.files[0];
