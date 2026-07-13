@@ -1412,6 +1412,7 @@
     }
 
     function dueGroupName(todo) {
+      if (todo.done) return "已完成";
       if (!todo.dueDate) return "无截止日期";
       if (isOverdue(todo.dueDate)) return "已逾期";
       if (isDueToday(todo.dueDate)) return "今天";
@@ -1427,7 +1428,7 @@
         return;
       }
       if (state.todoView === "due") {
-        const order = ["已逾期", "今天", "7 天内", "以后", "无截止日期"];
+        const order = ["已逾期", "今天", "7 天内", "以后", "无截止日期", "已完成"];
         container.innerHTML = order.map(name => renderTodoGroup(name, todos.filter(todo => dueGroupName(todo) === name))).join("");
         return;
       }
