@@ -371,6 +371,26 @@
       font-weight: 900;
     }
 
+    .todo-group[data-collapsible="true"] .todo-group-head {
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .todo-group[data-collapsed="true"] > :not(.todo-group-head) {
+      display: none;
+    }
+
+    .collapse-arrow {
+      display: inline-block;
+      margin-right: 5px;
+      font-size: 10px;
+      transition: transform 0.2s;
+    }
+
+    .todo-group[data-collapsed="false"] .collapse-arrow {
+      transform: rotate(90deg);
+    }
+
     .empty {
       display: grid;
       place-items: center;
@@ -1220,12 +1240,17 @@
       return dateValue === todayISO();
     }
 
-    function withinWeek(dateValue) {
+    function withinThisWeek(dateValue) {
       if (!dateValue) return false;
       const day = new Date(dateValue + "T00:00:00");
       const now = new Date(todayISO() + "T00:00:00");
-      const diff = (day - now) / 86400000;
-      return diff >= 0 && diff <= 7;
+      const dayOfWeek = (now.getDay() + 6) % 7;
+      const monday = new Date(now);
+      monday.setDate(now.getDate() - dayOfWeek);
+      const sunday = new Date(monday);
+      sunday.setDate(monday.getDate() + 6);
+      sunday.setHours(23, 59, 59, 999);
+      return day >= monday && day <= sunday;
     }
 
     function searchableText(item, type) {
@@ -1258,7 +1283,7 @@
         if (type !== "todo") return false;
         if (state.filters.due === "overdue" && !isOverdue(item.dueDate)) return false;
         if (state.filters.due === "today" && !isDueToday(item.dueDate)) return false;
-        if (state.filters.due === "week" && !withinWeek(item.dueDate)) return false;
+        if (state.filters.due === "week" && !withinThisWeek(item.dueDate)) return false;
         if (state.filters.due === "none" && item.dueDate) return false;
       }
       if (query && !searchableText(item, type).includes(query)) return false;
@@ -1351,7 +1376,7 @@
       const undone = scopedTodos.filter(todo => !todo.done);
       const activeSchedules = scopedSchedules.filter(item => scheduleStatus(item).className !== "ended");
       $("#statTodo").textContent = undone.length;
-      $("#statDue").textContent = undone.filter(todo => isOverdue(todo.dueDate) || withinWeek(todo.dueDate)).length;
+      $("#statDue").textContent = undone.filter(todo => withinThisWeek(todo.dueDate)).length;
       $("#statSchedule").textContent = activeSchedules.length;
       $("#statProjects").textContent = state.projects.length;
       $("#nav-all").textContent = undone.length;
@@ -1400,10 +1425,13 @@
     function renderTodoGroup(title, todos) {
       if (!todos.length) return "";
       const undoneCount = todos.filter(todo => !todo.done).length;
+      const collapsible = title === "以后" || title === "已完成" || title === "无截止日期";
+      const collapsedAttr = collapsible ? ' data-collapsible="true" data-collapsed="true"' : '';
+      const arrow = collapsible ? '<span class="collapse-arrow">▶</span>' : '';
       return `
-        <section class="todo-group">
+        <section class="todo-group"${collapsedAttr}>
           <div class="todo-group-head">
-            <span>${escapeHtml(title)}</span>
+            <span>${arrow}${escapeHtml(title)}</span>
             <span>${undoneCount} 未完成 / ${todos.length} 总计</span>
           </div>
           ${sortTodos(todos).map(renderTodoCard).join("")}
@@ -1416,7 +1444,7 @@
       if (!todo.dueDate) return "无截止日期";
       if (isOverdue(todo.dueDate)) return "已逾期";
       if (isDueToday(todo.dueDate)) return "今天";
-      if (withinWeek(todo.dueDate)) return "7 天内";
+      if (withinThisWeek(todo.dueDate)) return "本周";
       return "以后";
     }
 
@@ -1428,7 +1456,7 @@
         return;
       }
       if (state.todoView === "due") {
-        const order = ["已逾期", "今天", "7 天内", "以后", "无截止日期", "已完成"];
+        const order = ["已逾期", "今天", "本周", "以后", "无截止日期", "已完成"];
         container.innerHTML = order.map(name => renderTodoGroup(name, todos.filter(todo => dueGroupName(todo) === name))).join("");
         return;
       }
@@ -1473,7 +1501,11 @@
     }
 
     function renderSchedules() {
-      const schedules = filteredSchedules();
+      const [calYear, calMonth] = state.calendarDate.split("-").map(Number);
+      const schedules = filteredSchedules().filter(item => {
+        const t = new Date(item.time);
+        return t.getFullYear() === calYear && t.getMonth() + 1 === calMonth;
+      });
       const container = $("#scheduleList");
       if (!schedules.length) {
         container.innerHTML = `<div class="empty">暂无匹配日程。<br>添加会议、约定或生活提醒。</div>`;
@@ -1852,6 +1884,16 @@
         state.filters.tag = tagButton.dataset.tagFilter;
         render();
         return;
+      }
+
+      const groupHead = event.target.closest(".todo-group-head");
+      if (groupHead) {
+        const group = groupHead.closest(".todo-group");
+        if (group && group.dataset.collapsible === "true") {
+          const isCollapsed = group.dataset.collapsed === "true";
+          group.dataset.collapsed = isCollapsed ? "false" : "true";
+          return;
+        }
       }
 
       const actionButton = event.target.closest("[data-action]");

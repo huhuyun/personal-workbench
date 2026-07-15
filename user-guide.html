@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>个人工作台 Pro - 使用手册</title>
+<style>
+  :root {
+    --bg: #f7f8fa;
+    --bg2: #ffffff;
+    --ink: #1a1a2e;
+    --muted: #6b7280;
+    --rule: #e5e7eb;
+    --accent: #4f46e5;
+    --accent2: #0ea5e9;
+    --radius: 12px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans CJK SC", sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.7;
+    font-size: 16px;
+  }
+  .wrap {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+  .hero {
+    text-align: center;
+    margin-bottom: 48px;
+    padding: 48px 24px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: var(--radius);
+    color: #fff;
+  }
+  .hero h1 { font-size: 28px; margin-bottom: 8px; }
+  .hero p { font-size: 15px; opacity: 0.9; }
+  h2 {
+    font-size: 22px;
+    margin: 40px 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--accent);
+    color: var(--ink);
+  }
+  h3 {
+    font-size: 17px;
+    margin: 24px 0 10px;
+    color: var(--accent);
+  }
+  p { margin-bottom: 10px; color: var(--ink); }
+  ul { padding-left: 20px; margin-bottom: 12px; }
+  li { margin-bottom: 6px; }
+  .card {
+    background: var(--bg2);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    margin-bottom: 16px;
+  }
+  .card h3 { margin-top: 0; }
+  .badge {
+    display: inline-block;
+    background: var(--accent);
+    color: #fff;
+    font-size: 12px;
+    padding: 2px 10px;
+    border-radius: 20px;
+    margin-right: 6px;
+  }
+  .badge.blue { background: var(--accent2); }
+  .badge.gray { background: var(--muted); }
+  .tag-list span {
+    display: inline-block;
+    background: var(--bg);
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    padding: 2px 10px;
+    font-size: 13px;
+    margin: 2px 4px 2px 0;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 16px;
+    font-size: 15px;
+  }
+  th, td {
+    text-align: left;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--rule);
+  }
+  th { color: var(--muted); font-weight: 600; font-size: 13px; }
+  .tip {
+    background: #eff6ff;
+    border-left: 4px solid var(--accent2);
+    border-radius: 4px;
+    padding: 12px 16px;
+    margin: 16px 0;
+    font-size: 14px;
+    color: var(--ink);
+  }
+  .tip strong { color: var(--accent); }
+  .toc {
+    background: var(--bg2);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    padding: 24px 28px;
+    margin-bottom: 40px;
+  }
+  .toc ol { padding-left: 20px; }
+  .toc li { margin-bottom: 8px; }
+  .toc a { color: var(--accent); text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+  @media (max-width: 600px) {
+    .wrap { padding: 20px 16px 60px; }
+    .hero { padding: 32px 16px; }
+    .hero h1 { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <h1>个人工作台 Pro 使用手册</h1>
+  <p>待办 · 日程 · 日历 · 备忘 · 项目 · 多端同步</p>
+</div>
+
+<div class="toc">
+  <strong>目录</strong>
+  <ol>
+    <li><a href="#nav">页面导航</a></li>
+    <li><a href="#todo">待办事项</a></li>
+    <li><a href="#schedule">日程安排</a></li>
+    <li><a href="#calendar">日历视图</a></li>
+    <li><a href="#project">项目/主题</a></li>
+    <li><a href="#memo">信息备忘</a></li>
+    <li><a href="#data">数据管理</a></li>
+    <li><a href="#sync">云端同步</a></li>
+    <li><a href="#pwa">安装到手机/桌面</a></li>
+  </ol>
+</div>
+
+<h2 id="nav">页面导航</h2>
+<div class="card">
+  <p>页面顶部有四个导航按钮和一个搜索框：</p>
+  <table>
+    <tr><th>按钮</th><th>作用</th></tr>
+    <tr><td>首页</td><td>显示全部工作和生活内容</td></tr>
+    <tr><td>工作</td><td>只看工作相关待办、日程、备忘</td></tr>
+    <tr><td>生活</td><td>只看生活相关待办、日程、备忘</td></tr>
+    <tr><td>日历</td><td>跳转到月历视图</td></tr>
+  </table>
+  <p>搜索框可全局搜索待办、日程、备忘的标题和内容。</p>
+</div>
+
+<h2 id="todo">待办事项</h2>
+<div class="card">
+  <h3>添加待办</h3>
+  <p>在待办输入框输入标题，可设置以下属性：</p>
+  <div class="tag-list">
+    <span>范围：工作/生活</span>
+    <span>优先级：高/普通/低</span>
+    <span>截止日期</span>
+    <span>进度：0%~100%</span>
+    <span>所属项目/主题</span>
+    <span>标签（逗号分隔）</span>
+  </div>
+
+  <h3>分组展示</h3>
+  <p>点击右上角可切换两种视图：</p>
+  <ul>
+    <li><span class="badge">按截止日期</span> 分为：已逾期 → 今天 → 本周 → 以后 → 无截止日期 → 已完成</li>
+    <li><span class="badge blue">按项目主题</span> 按所属项目分组展示</li>
+  </ul>
+  <div class="tip"><strong>折叠功能：</strong>"以后""无截止日期""已完成"三个分组默认折叠，点击标题可展开/收起。</div>
+
+  <h3>操作</h3>
+  <table>
+    <tr><th>操作</th><th>方式</th></tr>
+    <tr><td>标记完成/取消完成</td><td>点击待办左侧复选框</td></tr>
+    <tr><td>编辑</td><td>点击"改"按钮</td></tr>
+    <tr><td>删除</td><td>点击"×"按钮</td></tr>
+  </table>
+  <div class="tip"><strong>自动联动：</strong>标记为已完成时，进度自动变为 100%。</div>
+</div>
+
+<h2 id="schedule">日程安排</h2>
+<div class="card">
+  <h3>添加日程</h3>
+  <p>在日程表单中填写：</p>
+  <div class="tag-list">
+    <span>标题（必填）</span>
+    <span>开始时间（必填）</span>
+    <span>结束时间</span>
+    <span>范围：工作/生活</span>
+    <span>所属项目/主题</span>
+    <span>标签</span>
+  </div>
+
+  <h3>展示规则</h3>
+  <ul>
+    <li>日程列表<strong>按日历选择的月份过滤</strong>，日历切到 8 月只看 8 月日程</li>
+    <li>按开始时间升序排列</li>
+    <li>自动标记状态：进行中 / 即将开始 / 已结束</li>
+  </ul>
+</div>
+
+<h2 id="calendar">日历视图</h2>
+<div class="card">
+  <ul>
+    <li>按月展示日程和有截止日期的待办</li>
+    <li>点击"上月""下月"切换月份</li>
+    <li>切换月份后，下方日程列表同步过滤为对应月份</li>
+    <li>每天格子内显示当日日程和待办的数量标记</li>
+  </ul>
+</div>
+
+<h2 id="project">项目/主题</h2>
+<div class="card">
+  <p>项目/主题用于给待办、备忘、日程建立上下文关联。</p>
+  <h3>操作</h3>
+  <table>
+    <tr><th>操作</th><th>说明</th></tr>
+    <tr><td>新增</td><td>输入名称，点击"添加"</td></tr>
+    <tr><td>编辑</td><td>点击"编辑"修改名称</td></tr>
+    <tr><td>删除</td><td>仅可删除无关联事项的项目</td></tr>
+    <tr><td>排序</td><td>点击"上移""下移"调整顺序</td></tr>
+  </table>
+  <div class="tip">"未归类"是默认项目，不可删除或排序。</div>
+</div>
+
+<h2 id="memo">信息备忘</h2>
+<div class="card">
+  <h3>添加备忘</h3>
+  <p>填写标题（必填）和内容（必填），可设置：</p>
+  <div class="tag-list">
+    <span>范围：工作/生活</span>
+    <span>所属项目/主题</span>
+    <span>标签</span>
+  </div>
+  <p>适合记录会议纪要、资料链接、购物灵感等。</p>
+</div>
+
+<h2 id="data">数据管理</h2>
+<div class="card">
+  <p>页面底部"本地数据管理"区域（可折叠）：</p>
+  <table>
+    <tr><th>功能</th><th>说明</th></tr>
+    <tr><td>填充示例数据</td><td>一键生成演示用待办、日程、备忘</td></tr>
+    <tr><td>导出 JSON</td><td>下载全部数据为 JSON 文件</td></tr>
+    <tr><td>导入 JSON</td><td>从备份文件恢复数据</td></tr>
+    <tr><td>清空数据</td><td>删除所有本地数据（不可撤销）</td></tr>
+  </table>
+</div>
+
+<h2 id="sync">云端同步</h2>
+<div class="card">
+  <h3>注册与登录</h3>
+  <ul>
+    <li>在"PWA 与云端同步"区域输入邮箱和密码</li>
+    <li>点击"注册"创建账号，需到邮箱确认</li>
+    <li>点击"登录"使用已有账号</li>
+  </ul>
+
+  <h3>自动同步</h3>
+  <p><span class="badge">默认开启</span> 勾选"自动同步"后：</p>
+  <ul>
+    <li><strong>自动上传：</strong>每次新增/编辑/删除数据后，延迟 3 秒自动上传到云端</li>
+    <li><strong>自动拉取：</strong>页面加载或登录成功后，自动从云端拉取最新数据</li>
+    <li>状态栏显示"自动同步已开启 · 上次同步 HH:MM"</li>
+  </ul>
+
+  <h3>手动同步</h3>
+  <ul>
+    <li>"上传本地到云端"：强制上传当前数据</li>
+    <li>"从云端拉取"：强制拉取云端数据（会覆盖本地）</li>
+  </ul>
+
+  <div class="tip"><strong>多端使用：</strong>电脑改了数据 → 自动上传 → 手机打开页面 → 自动拉取，无需手动操作。</div>
+</div>
+
+<h2 id="pwa">安装到手机/桌面</h2>
+<div class="card">
+  <h3>手机安装（PWA）</h3>
+  <ul>
+    <li><strong>iPhone：</strong>用 Safari 打开页面 → 分享 → 添加到主屏幕</li>
+    <li><strong>Android：</strong>用 Chrome 打开页面 → 菜单 → 安装应用</li>
+  </ul>
+  <h3>桌面安装</h3>
+  <ul>
+    <li>用 Chrome/Edge 打开页面 → 地址栏右侧安装图标 → 安装</li>
+  </ul>
+  <div class="tip">安装后像原生 App 一样使用，全屏启动，无需浏览器地址栏。</div>
+</div>
+
+<div style="text-align:center; margin-top:48px; color:var(--muted); font-size:13px;">
+  个人工作台 Pro · 使用手册 · 2026
+</div>
+
+</div>
+</body>
+</html>
