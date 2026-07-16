@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>个人工作台 Pro - 需求文档</title>
+<style>
+  :root {
+    --bg: #f7f8fa;
+    --bg2: #ffffff;
+    --ink: #1a1a2e;
+    --muted: #6b7280;
+    --rule: #e5e7eb;
+    --accent: #4f46e5;
+    --accent2: #0ea5e9;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --radius: 12px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans CJK SC", sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.7;
+    font-size: 16px;
+  }
+  .wrap {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+  .hero {
+    text-align: center;
+    margin-bottom: 48px;
+    padding: 48px 24px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: var(--radius);
+    color: #fff;
+  }
+  .hero h1 { font-size: 28px; margin-bottom: 8px; }
+  .hero p { font-size: 15px; opacity: 0.9; }
+  h2 {
+    font-size: 22px;
+    margin: 40px 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--accent);
+    color: var(--ink);
+  }
+  h3 {
+    font-size: 17px;
+    margin: 24px 0 10px;
+    color: var(--accent);
+  }
+  p { margin-bottom: 10px; color: var(--ink); }
+  ul { padding-left: 20px; margin-bottom: 12px; }
+  li { margin-bottom: 6px; }
+  .card {
+    background: var(--bg2);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    margin-bottom: 16px;
+  }
+  .card h3 { margin-top: 0; }
+  .badge {
+    display: inline-block;
+    background: var(--accent);
+    color: #fff;
+    font-size: 12px;
+    padding: 2px 10px;
+    border-radius: 20px;
+    margin-right: 6px;
+    font-weight: 500;
+  }
+  .badge.new { background: var(--success); }
+  .badge.improve { background: var(--warning); }
+  .badge.fix { background: #ef4444; }
+  .version-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+  .version-tag {
+    background: var(--accent);
+    color: #fff;
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 14px;
+  }
+  .version-date {
+    color: var(--muted);
+    font-size: 14px;
+  }
+  .version-desc {
+    color: var(--ink);
+    font-size: 15px;
+    margin-left: auto;
+    font-weight: 500;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 16px;
+    font-size: 15px;
+  }
+  th, td {
+    text-align: left;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--rule);
+    vertical-align: top;
+  }
+  th { color: var(--muted); font-weight: 600; font-size: 13px; background: var(--bg); }
+  th:first-child { border-top-left-radius: 8px; }
+  th:last-child { border-top-right-radius: 8px; }
+  .type-col { width: 90px; }
+  .status-col { width: 80px; }
+  .status-done {
+    color: var(--success);
+    font-weight: 500;
+  }
+  .tip {
+    background: #eff6ff;
+    border-left: 4px solid var(--accent2);
+    border-radius: 4px;
+    padding: 12px 16px;
+    margin: 16px 0;
+    font-size: 14px;
+    color: var(--ink);
+  }
+  .tip strong { color: var(--accent); }
+  .toc {
+    background: var(--bg2);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    padding: 24px 28px;
+    margin-bottom: 40px;
+  }
+  .toc ol { padding-left: 20px; }
+  .toc li { margin-bottom: 8px; }
+  .toc a { color: var(--accent); text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+  .timeline {
+    position: relative;
+    padding-left: 28px;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 8px;
+    top: 8px;
+    bottom: 8px;
+    width: 2px;
+    background: var(--rule);
+  }
+  .timeline-item {
+    position: relative;
+    margin-bottom: 24px;
+  }
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -24px;
+    top: 8px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 2px solid var(--bg2);
+    box-shadow: 0 0 0 2px var(--accent);
+  }
+  .summary-table {
+    margin-top: 16px;
+  }
+  .file-list {
+    font-family: 'SF Mono', Consolas, monospace;
+    font-size: 13px;
+    background: var(--bg);
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: var(--accent);
+  }
+  @media (max-width: 600px) {
+    .wrap { padding: 20px 16px 60px; }
+    .hero { padding: 32px 16px; }
+    .hero h1 { font-size: 22px; }
+    .version-desc { margin-left: 0; width: 100%; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <h1>个人工作台 Pro 需求文档</h1>
+  <p>历史需求记录 · 版本追踪 · 变更日志</p>
+</div>
+
+<div class="toc">
+  <strong>目录</strong>
+  <ol>
+    <li><a href="#overview">版本总览</a></li>
+    <li><a href="#v2-20260716-1">v2-20260716-1 · 折叠优化与进度联动</a></li>
+    <li><a href="#v2-20260715-1">v2-20260715-1 · 月份过滤与折叠分组</a></li>
+    <li><a href="#v2-20260714-1">v2-20260714-1 · 用户手册发布</a></li>
+    <li><a href="#v2-20260713-1">v2-20260713-1 · 云端同步上线</a></li>
+    <li><a href="#v1-0">v1.0 · 基础功能版本</a></li>
+  </ol>
+</div>
+
+<h2 id="overview">版本总览</h2>
+<div class="card">
+  <table class="summary-table">
+    <tr>
+      <th>版本号</th>
+      <th>发布日期</th>
+      <th>主题</th>
+      <th>主要变更</th>
+    </tr>
+    <tr>
+      <td><strong>v2-20260716-1</strong></td>
+      <td>2026-07-16</td>
+      <td>折叠优化与进度联动</td>
+      <td>全分组可折叠、项目管理默认折叠、进度与完成双向联动、缓存版本化</td>
+    </tr>
+    <tr>
+      <td>v2-20260715-1</td>
+      <td>2026-07-15</td>
+      <td>月份过滤与折叠分组</td>
+      <td>日程按月过滤、待办部分分组默认折叠</td>
+    </tr>
+    <tr>
+      <td>v2-20260714-1</td>
+      <td>2026-07-14</td>
+      <td>用户手册发布</td>
+      <td>新增使用手册文档</td>
+    </tr>
+    <tr>
+      <td>v2-20260713-1</td>
+      <td>2026-07-13</td>
+      <td>云端同步上线</td>
+      <td>Supabase 云端同步、自动上传/拉取、PWA 支持</td>
+    </tr>
+    <tr>
+      <td>v1.0</td>
+      <td>2026-07-01</td>
+      <td>基础功能版本</td>
+      <td>待办、日程、日历、项目、备忘核心功能</td>
+    </tr>
+  </table>
+  <div class="tip"><strong>版本号规则：</strong>v{大版本}-{日期}-{当日序号}。大版本号随重大功能升级递增；日期格式 YYYYMMDD；当日序号表示当天第几次更新。</div>
+</div>
+
+<!-- ===== v2-20260716-1 ===== -->
+<h2 id="v2-20260716-1">v2-20260716-1</h2>
+<div class="card">
+  <div class="version-header">
+    <span class="version-tag">v2-20260716-1</span>
+    <span class="version-date">2026-07-16</span>
+    <span class="version-desc">折叠优化与进度联动</span>
+  </div>
+
+  <h3>需求清单</h3>
+  <table>
+    <tr>
+      <th class="type-col">类型</th>
+      <th>需求描述</th>
+      <th class="status-col">状态</th>
+    </tr>
+    <tr>
+      <td><span class="badge improve">优化</span></td>
+      <td>待办事项"已逾期""今天""本周"分组也支持折叠，默认展开状态</td>
+      <td class="status-done">已完成</td>
+    </tr>
+    <tr>
+      <td><span class="badge improve">优化</span></td>
+      <td>项目/主题管理模块默认折叠，减少页面干扰</td>
+      <td class="status-done">已完成</td>
+    </tr>
+    <tr>
+      <td><span class="badge new">新增</span></td>
+      <td>新增待办时，进度填 100% 自动将状态置为"已完成"（双向联动）</td>
+      <td class="status-done">已完成</td>
+    </tr>
+    <tr>
+      <td><span class="badge improve">优化</span></td>
+      <td>Service Worker 缓存版本化策略，避免每次更新后手动清缓存</td>
+      <td class="status-done">已完成</td>
+    </tr>
+    <tr>
+      <td><span class="badge new">新增</span></td>
+      <td>生成需求文档，记录历史需求与版本号，后续同步更新</td>
+      <td class="status-done">已完成</td>
+    </tr>
+  </table>
+
+  <h3>涉及文件</h3>
+  <ul>
+    <li><span class="file-list">index.html</span> — 折叠逻辑、进度联动、UI 调整</li>
+    <li><span class="file-list">sw.js</span> — 缓存版本号更新</li>
+    <li><span class="file-list">user-guide.html</span> — 用户手册内容更新</li>
+    <li><span class="file-list">requirements.html</span> — 新增需求文档</li>
+  </ul>
+
+  <h3>详细说明</h3>
+  <ul>
+    <li><strong>全分组折叠：</strong>待办事项所有分组（已逾期、今天、本周、以后、无截止日期、已完成）均支持点击标题展开/收起；"已逾期""今天""本周"默认展开，其余默认折叠</li>
+    <li><strong>进度联动：</strong>勾选完成 → 进度自动 100%；编辑时进度设为 100% → 自动标记完成，双向保持一致</li>
+    <li><strong>缓存策略：</strong>版本号格式 v{大版本}-{日期}-{当日序号}，每次更新自动递增，激活时自动清理旧缓存</li>
+  </ul>
+</div>
+
+<!-- ===== v2-20260715-1 ===== -->
+<h2 id="v2-20260715-1">v2-20260715-1</h2>
+<div class="card">
+  <div class="version-header">
+    <span class="version-tag">v2-20260715-1</span>
+    <span class="version-date">2026-07-15</span>
+    <span class="version-desc">月份过滤与折叠分组</span>
+  </div>
+
+  <h3>需求清单</h3>
+  <table>
+    <tr>
+      <th class="type-col">类型</th>
+      <th>需求描述</th>
+      <th class="status-col">状态</th>
+    </tr>
+    <tr>
+      <td><span class="badge new">新增</span></td>
+      <td>日程安排按日历选择的月份过滤展示，如选 8 月则不展示 7 月日程</td>
+      <td class="status-done">已完成</td>
+    </tr>
+    <tr>
+      <td><span class="badge improve">优化</span></td>
+      <td>待办事项"以后"和"已完成"分类默认折叠，用户可手动展开</td>
+      <td class="status-done">已完成</td>
+    </tr>
+    <tr>
+      <td><span class="badge improve">优化</span></td>
+      <td>待办事项"无截止日期"分组也默认折叠</td>
+      <td class="status-done">已完成</td>
+    </tr>
+  </table>
+
+  <h3>涉及文件</h3>
+  <ul>
+    <li><span class="file-list">index.html</span> — 日程过滤逻辑、待办分组折叠</li>
+  </ul>
+
+  <h3>详细说明</h3>
+  <ul>
+    <li><strong>日程月份过滤：</strong>仅针对日程安排模块，待办事项不受影响；日历切换月份后，下方日程列表同步更新</li>
+    <li><strong>折叠分组：</strong>"以后""已完成""无截止日期"三个低频分组默认收起，聚焦当前重要事项</li>
+  </ul>
+</div>
+
+<!-- ===== v2-20260714-1 ===== -->
+<h2 id="v2-20260714-1">v2-20260714-1</h2>
+<div class="card">
+  <div class="version-header">
+    <span class="version-tag">v2-20260714-1</span>
+    <span class="version-date">2026-07-14</span>
+    <span class="version-desc">用户手册发布</span>
+  </div>
+
+  <h3>需求清单</h3>
+  <table>
+    <tr>
+      <th class="type-col">类型</th>
+      <th>需求描述</th>
+      <th class="status-col">状态</th>
+    </tr>
+    <tr>
+      <td><span class="badge new">新增</span></td>
+      <td>生成工作台使用手册，功能分区介绍简洁明了，帮助用户快速上手</td>
+      <td class="status-done">已完成</td>
+    </tr>
+  </table>
+
+  <h3>涉及文件</h3>
+  <ul>
+    <li><span class="file-list">user-guide.html</span> — 新增用户使用手册</li>
+  </ul>
+</div>
+
+<!-- ===== v2-20260713-1 ===== -->
+<h2 id="v2-20260713-1">v2-20260713-1</h2>
+<div class="card">
+  <div class="version-header">
+    <span class="version-tag">v2-20260713-1</span>
+    <span class="version-date">2026-07-13</span>
+    <span class="version-desc">云端同步上线</span>
+  </div>
+
+  <h3>需求清单</h3>
+  <table>
+    <tr>
+      <th class="type-col">类型</th>
+      <th>需求描述</th>
+      <th class="status-col">状态</th>
+    </tr>
+    <tr>
+      <td><span class="badge new">新增</span></td>
+      <td>接入 Supabase 实现云端数据同步，支持多端使用</td>
+      <td class="status-done">已完成</td>
+    </tr>
+    <tr>
+      <td><span class="badge new">新增</span></td>
+      <td>自动同步：数据变更后延迟 3 秒自动上传，页面加载时自动拉取</td>
+      <td class="status-done">已完成</td>
+    </tr>
+    <tr>
+      <td><span class="badge new">新增</span></td>
+      <td>手动同步：支持手动上传本地数据和从云端拉取</td>
+      <td class="status-done">已完成</td>
+    </tr>
+    <tr>
+      <td><span class="badge new">新增</span></td>
+      <td>用户注册与登录（邮箱 + 密码）</td>
+      <td class="status-done">已完成</td>
+    </tr>
+    <tr>
+      <td><span class="badge new">新增</span></td>
+      <td>PWA 支持，可安装到手机/桌面，像原生 App 一样使用</td>
+      <td class="status-done">已完成</td>
+    </tr>
+    <tr>
+      <td><span class="badge new">新增</span></td>
+      <td>Service Worker 离线缓存</td>
+      <td class="status-done">已完成</td>
+    </tr>
+    <tr>
+      <td><span class="badge fix">修复</span></td>
+      <td>修复 formatTime 未定义导致的云端状态显示错误</td>
+      <td class="status-done">已完成</td>
+    </tr>
+  </table>
+
+  <h3>涉及文件</h3>
+  <ul>
+    <li><span class="file-list">index.html</span> — 同步逻辑、UI、认证功能</li>
+    <li><span class="file-list">config.js</span> — Supabase 配置</li>
+    <li><span class="file-list">sw.js</span> — Service Worker 缓存</li>
+    <li><span class="file-list">manifest.webmanifest</span> — PWA 清单</li>
+  </ul>
+</div>
+
+<!-- ===== v1.0 ===== -->
+<h2 id="v1-0">v1.0</h2>
+<div class="card">
+  <div class="version-header">
+    <span class="version-tag">v1.0</span>
+    <span class="version-date">2026-07-01</span>
+    <span class="version-desc">基础功能版本</span>
+  </div>
+
+  <h3>需求清单</h3>
+  <table>
+    <tr>
+      <th class="type-col">类型</th>
+      <th>需求描述</th>
+      <th class="status-col">状态</th>
+    </tr>
+    <tr>
+      <td><span class="badge new">新增</span></td>
+      <td>待办事项管理：添加、编辑、删除、标记完成、优先级、截止日期、进度、标签</td>
+      <td class="status-done">已完成</td>
+    </tr>
+    <tr>
+      <td><span class="badge new">新增</span></td>
+      <td>待办事项按截止日期分组（已逾期/今天/本周/以后/无截止日期/已完成）</td>
+      <td class="status-done">已完成</td>
+    </tr>
+    <tr>
+      <td><span class="badge new">新增</span></td>
+      <td>待办事项按项目主题分组视图</td>
+      <td class="status-done">已完成</td>
+    </tr>
+    <tr>
+      <td><span class="badge new">新增</span></td>
+      <td>日程安排：添加、编辑、删除、时间范围、状态标记</td>
+      <td class="status-done">已完成</td>
+    </tr>
+    <tr>
+      <td><span class="badge new">新增</span></td>
+      <td>日历视图：按月展示日程和待办，月份切换</td>
+      <td class="status-done">已完成</td>
+    </tr>
+    <tr>
+      <td><span class="badge new">新增</span></td>
+      <td>项目/主题管理：新增、编辑、删除、排序</td>
+      <td class="status-done">已完成</td>
+    </tr>
+    <tr>
+      <td><span class="badge new">新增</span></td>
+      <td>信息备忘：添加、编辑、删除、分类</td>
+      <td class="status-done">已完成</td>
+    </tr>
+    <tr>
+      <td><span class="badge new">新增</span></td>
+      <td>工作/生活范围分类，导航切换视图</td>
+      <td class="status-done">已完成</td>
+    </tr>
+    <tr>
+      <td><span class="badge new">新增</span></td>
+      <td>全局搜索：搜索待办、日程、备忘的标题和内容</td>
+      <td class="status-done">已完成</td>
+    </tr>
+    <tr>
+      <td><span class="badge new">新增</span></td>
+      <td>本地数据管理：导入、导出 JSON、清空、示例数据</td>
+      <td class="status-done">已完成</td>
+    </tr>
+    <tr>
+      <td><span class="badge new">新增</span></td>
+      <td>待办完成时进度自动变为 100%（单向联动）</td>
+      <td class="status-done">已完成</td>
+    </tr>
+  </table>
+
+  <h3>涉及文件</h3>
+  <ul>
+    <li><span class="file-list">index.html</span> — 全部核心功能</li>
+  </ul>
+</div>
+
+<div style="text-align:center; margin-top:48px; color:var(--muted); font-size:13px;">
+  个人工作台 Pro · 需求文档 · 版本 v2-20260716-1
+</div>
+
+</div>
+</body>
+</html>

@@ -263,6 +263,10 @@
     .panel h3 { margin: 0; font-size: var(--font-md); letter-spacing: -0.02em; }
     .panel-head p { margin: 3px 0 0; color: var(--muted); font-size: var(--font-xs); line-height: 1.5; }
 
+    .collapsible-head { cursor: pointer; user-select: none; }
+    .collapsible-panel[data-collapsed="true"] > :not(.collapsible-head) { display: none; }
+    .collapsible-panel[data-collapsed="false"] .collapse-arrow { transform: rotate(90deg); }
+
     .filters {
       display: grid;
       grid-template-columns: 1fr 0.7fr 0.7fr 0.7fr;
@@ -926,10 +930,10 @@
           <div class="calendar" id="calendarGrid"></div>
         </div>
 
-        <div class="panel" id="projectPanel">
-          <div class="panel-head">
+        <div class="panel collapsible-panel" id="projectPanel">
+          <div class="panel-head collapsible-head">
             <div>
-              <h3>项目 / 主题管理</h3>
+              <h3>项目 / 主题管理 <span class="collapse-arrow">▶</span></h3>
               <p>用于给待办、备忘和日程建立上下文。</p>
             </div>
           </div>
@@ -1425,13 +1429,11 @@
     function renderTodoGroup(title, todos) {
       if (!todos.length) return "";
       const undoneCount = todos.filter(todo => !todo.done).length;
-      const collapsible = title === "以后" || title === "已完成" || title === "无截止日期";
-      const collapsedAttr = collapsible ? ' data-collapsible="true" data-collapsed="true"' : '';
-      const arrow = collapsible ? '<span class="collapse-arrow">▶</span>' : '';
+      const collapsedByDefault = title === "以后" || title === "已完成" || title === "无截止日期";
       return `
-        <section class="todo-group"${collapsedAttr}>
+        <section class="todo-group" data-collapsible="true" data-collapsed="${collapsedByDefault}">
           <div class="todo-group-head">
-            <span>${arrow}${escapeHtml(title)}</span>
+            <span><span class="collapse-arrow">▶</span>${escapeHtml(title)}</span>
             <span>${undoneCount} 未完成 / ${todos.length} 总计</span>
           </div>
           ${sortTodos(todos).map(renderTodoCard).join("")}
@@ -1737,9 +1739,13 @@
       };
       if (editing.todoId) {
         const todo = state.todos.find(item => item.id === editing.todoId);
-        if (todo) Object.assign(todo, data, { updatedAt: Date.now() });
+        if (todo) {
+          Object.assign(todo, data, { updatedAt: Date.now() });
+          if (data.progress === 100) todo.done = true;
+          else if (data.progress < 100) todo.done = false;
+        }
       } else {
-        state.todos.push({ id: uid(), ...data, done: false, createdAt: Date.now() });
+        state.todos.push({ id: uid(), ...data, done: data.progress === 100, createdAt: Date.now() });
       }
       rememberProject(data.projectId);
       resetTodoForm();
@@ -2180,6 +2186,20 @@
         updateCloudUi();
       });
     }
+
+    // 可折叠面板初始化
+    document.querySelectorAll(".collapsible-panel").forEach(panel => {
+      if (!panel.dataset.collapsed) panel.dataset.collapsed = "true";
+    });
+    document.addEventListener("click", event => {
+      const head = event.target.closest(".collapsible-head");
+      if (head) {
+        const panel = head.closest(".collapsible-panel");
+        if (panel) {
+          panel.dataset.collapsed = panel.dataset.collapsed === "true" ? "false" : "true";
+        }
+      }
+    });
 
     $("#importFile").addEventListener("change", event => {
       const file = event.target.files[0];

@@ -1,4 +1,5 @@
-const CACHE_NAME = "personal-workbench-pro-v2";
+const CACHE_VERSION = "v2-20260716-1";
+const CACHE_NAME = "personal-workbench-pro-" + CACHE_VERSION;
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -17,7 +18,11 @@ self.addEventListener("install", event => {
 self.addEventListener("activate", event => {
   event.waitUntil(
     caches.keys().then(keys =>
-      Promise.all(keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key)))
+      Promise.all(
+        keys
+          .filter(key => key !== CACHE_NAME)
+          .map(key => caches.delete(key))
+      )
     )
   );
   self.clients.claim();
@@ -28,7 +33,6 @@ self.addEventListener("fetch", event => {
   const requestUrl = new URL(event.request.url);
   if (requestUrl.origin !== self.location.origin) return;
 
-  // 优先从网络获取，获取失败再用缓存兜底
   event.respondWith(
     fetch(event.request)
       .then(response => {
